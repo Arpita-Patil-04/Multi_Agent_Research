@@ -43,3 +43,4 @@ lxml==6.0.2
 # Configuration / data validation
 python-dotenv==1.2.3
 pydantic==2.13.5
+

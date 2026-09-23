@@ -21,20 +21,25 @@ python-dotenv>=1.0.0
 # Data handling
 pandas>=2.0.0
 
-# Token counting / text utilities
-tiktoken>=0.6.0
+# Multi-Agent Research System
+# Python dependencies
 
-# Logging / debugging
-rich>=13.7.0
+# Multi-Agent Research System
+# Python 3.13.x
+#
+# Versions checked against PyPI on 2026-09-23.
 
-# Retry + robustness
-tenacity>=8.2.0
+# LLM / Agent framework
+langchain==1.4.2
+langchain-openai==1.6.3
+langgraph==1.2.12
 
-# JSON handling improvements
-orjson>=3.9.0
+# Web research
+tavily-python==0.8.4
+beautifulsoup4==4.15.0
+requests==2.34.2
+lxml==6.0.2
 
-# Typing support
-pydantic>=2.5.0
-
-# Advanced HTML parsing / cleanup
-html5lib>=1.1
+# Configuration / data validation
+python-dotenv==1.2.3
+pydantic==2.13.5

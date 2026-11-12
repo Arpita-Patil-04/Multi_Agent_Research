@@ -32,12 +32,7 @@ st.markdown("""
     margin-bottom: 30px;
 }
 
-.result-card {
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    margin-bottom: 20px;
-}
+
 
 </style>
 """, unsafe_allow_html=True)
@@ -117,26 +112,20 @@ topic = st.text_input(
 if st.button("🚀 Start Research", type="primary"):
 
     if not topic.strip():
-
         st.warning("Please enter a research topic first.")
 
     else:
-
         st.session_state["research_result"] = None
 
-        with st.spinner("🤖 AI agents are researching your topic..."):
+        try:
+            with st.status("🤖 AI agents are researching...", expanded=True) as status:
+                result = run_research_pipeline(topic, on_step=st.write)
+                status.update(label="Research complete", state="complete", expanded=False)
 
-            try:
+            st.session_state["research_result"] = result
 
-                result = run_research_pipeline(topic)
-
-                st.session_state["research_result"] = result
-
-            except Exception as e:
-
-                st.error(
-                    f"An error occurred while running the research pipeline:\n\n{e}"
-                )
+        except Exception as e:
+            st.error(f"An error occurred while running the research pipeline:\n\n{e}")
 
 
 # --------------------------------------------------
@@ -192,12 +181,12 @@ if st.session_state.get("research_result"):
     # Critic Feedback
     # ----------------------------------------------
 
+    if result.get("score"):
+        st.caption(f"Final score: {result['score']}/10 after {result.get('attempts')} draft(s)")
+
     st.subheader("🧐 Critic Evaluation")
 
-    feedback = result.get(
-        "feedback",
-        "No critic feedback available."
-    )
+    feedback = result.get("feedback") or "No critic feedback available."
 
     st.markdown(feedback)
 
@@ -208,6 +197,6 @@ if st.session_state.get("research_result"):
     st.download_button(
         label="⬇️ Download Research Report",
         data=report,
-        file_name="research_report.txt",
-        mime="text/plain"
+        file_name="research_report.md",
+        mime="text/markdown"
     )

@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from tavily import TavilyClient
 import os
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -29,12 +30,35 @@ def web_search(query: str) -> str:
     return "\n----\n".join(out)
 
 
+
+
+def clean_markdown(text: str) -> str:
+    text = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", text)       
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)   
+    lines = [ln.strip() for ln in text.splitlines()]
+    # keep real sentences and headings, drop short menu items
+    lines = [ln for ln in lines if len(ln) > 40 or ln.startswith("#")]
+    return "\n".join(lines)
+
 @tool
 def web_scrape(url: str) -> str:
     """Scrape a webpage. Input must be a full URL starting with http:// or https://.
     Returns the main readable text of the page, or an error message."""
     if not url.startswith(("http://", "https://")):
         return "Invalid URL: must start with http:// or https://"
+
+    # 1) Try Tavily Extract first
+    try:
+        data = tavily.extract(urls=[url])
+        if data.get("results"):
+            text = data["results"][0].get("raw_content") or ""
+            text = clean_markdown(text)
+            if text.strip():
+                return f"SOURCE: {url}\n" + text[:3000]
+    except Exception:
+        pass  # fall through to the old method
+
+    # 2) Fall back to requests + BeautifulSoup (your existing code)
     try:
         resp = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
         resp.raise_for_status()

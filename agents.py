@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0, max_retries=6)
-critic_llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0, max_retries=6)
+
 
 # ---------- Agents ----------
 
@@ -113,7 +113,7 @@ Areas to Improve:
 Verdict: one line"""),
 ])
 
-critic_chain = critic_prompt | critic_llm | StrOutputParser()
+critic_chain = critic_prompt | llm | StrOutputParser()
 
 
 def parse_score(text: str) -> int:
